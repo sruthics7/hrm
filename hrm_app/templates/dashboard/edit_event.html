@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}HRM-DASHBOARD{% endblock %}
+
+{% block content %}
+<div class="container mt-8">
+    <h2>Edit Event</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" value="{{ event.title }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Start Time</label>
+            <input type="datetime-local" name="start_time" class="form-control"
+                   value="{{ event.start_time|date:'Y-m-d\\TH:i' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">End Time</label>
+            <input type="datetime-local" name="end_time" class="form-control"
+                   value="{{ event.end_time|date:'Y-m-d\\TH:i' }}">
+        </div>
+        <button type="submit" class="btn btn-success">Update</button>
+        <a href="{% url 'upcoming' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

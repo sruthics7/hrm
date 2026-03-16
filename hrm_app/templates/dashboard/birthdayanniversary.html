@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}HRM-DASHBOARD{% endblock %}
+{% block content %}
+<div class="grid grid-cols-12 gap-6 mt-5">
+
+    <!-- BEGIN: Employee Birthdays -->
+    <div class="col-span-12">
+        <div class="intro-y box p-5">
+            <div class="flex items-center mb-5">
+                <h2 class="text-lg font-medium">Employee Birthdays</h2>
+
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>EMPLOYEE ID</th>
+                            <th>EMPLOYEE</th>
+                            <th>DEPARTMENT</th>
+                            <th>BIRTH DATE</th>
+                            <th>AGE</th>
+                            <th>UPCOMING</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in birthdays %}
+                        <tr>
+                            <td>#Xev{{ employee.id }}</td>
+                            <td>
+                                <div class="flex items-center">
+
+                                    <div class="ml-4">
+                                        <a href="#" class="font-medium">{{ employee.full_name }}</a>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>{{ employee.department }}</td>
+                            <td>{{ employee.date_of_birth|date:"F d, Y" }}</td>
+                            <td>{{ employee.age }}</td>
+                            <td>
+                                <div class="flex items-center">
+                                    {% if employee.is_birthday_today %}
+                                    <div class="w-2 h-2 bg-success rounded-full mr-2"></div>
+                                    <span class="text-success font-semibold">
+                                        Today 
+                                    </span>
+                                    {% else %}
+                                    <span>{{ employee.birthday_in }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center text-primary mr-3" href="#">
+                                        <i data-lucide="message-square" class="w-4 h-4 mr-1"></i>
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="employee_id" value="{{ employee.id }}">
+                                            <input type="hidden" name="wish_type" value="birthday">
+                                            <button type="submit" class="text-primary">
+                                                Send Wishes
+                                            </button>
+                                        </form>
+
+                                    </a>
+
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-slate-500">No birthdays this month.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN: Employee Work Anniversaries -->
+    <div class="col-span-12 mt-10">
+        <div class="intro-y box p-5">
+            <div class="flex items-center mb-5">
+                <h2 class="text-lg font-medium">Work Anniversaries</h2>
+
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>EMPLOYEE ID</th>
+                            <th>EMPLOYEE</th>
+                            <th>DEPARTMENT</th>
+                            <th>JOINING DATE</th>
+                            <th>YEARS</th>
+                            <th>UPCOMING</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in anniversaries %}
+                        <tr>
+                            <td>#Xev{{ employee.id }}</td>
+                            <td>
+                                <div class="flex items-center">
+
+                                    <div class="ml-4">
+                                        <a href="#" class="font-medium">{{ employee.full_name }}</a>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>{{ employee.department }}</td>
+                            <td>{{ employee.joining_date|date:"F d, Y" }}</td>
+                            <td>{{ employee.years }}</td>
+                            <td>
+                                <div class="flex items-center">
+                                    {% if employee.is_anniversary_today %}
+                                    <div class="w-2 h-2 bg-success rounded-full mr-2"></div>
+                                    <span class="text-success font-semibold">
+                                        Today 
+                                    </span>
+                                    {% else %}
+                                    <span>{{ employee.anniversary_in }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="flex justify-center items-center">
+                                    <a class="flex items-center text-primary mr-3" href="#">
+                                        <i data-lucide="message-square" class="w-4 h-4 mr-1"></i>
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="employee_id" value="{{ employee.id }}">
+                                            <input type="hidden" name="wish_type" value="anniversary">
+                                            <button type="submit" class="text-primary">
+                                                Congratulate
+                                            </button>
+                                        </form>
+
+                                    </a>
+
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-slate-500">No anniversaries this month.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}HRM - Holidays{% endblock %}
+{% block content %}
+
+<body>
+
+    <div class="leave-tracker">
+
+      
+
+        <!-- Add Holiday Form -->
+        {% if user.is_superuser %}
+        <div class="leave-form">
+            <h3>Add Holiday</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="name">Holiday Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter holiday name" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date" min="{{ today|date:'Y-m-d' }}" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="holiday_type">Type</label>
+                        <select name="holiday_type" id="holiday_type" required>
+                            <option value="common">Common Leave</option>
+                            <option value="company">Company Leave</option>
+                        </select>
+                    </div>
+
+                </div>
+                <button type="submit">Add Holiday</button>
+            </form>
+        </div>
+        {% endif %}
+
+
+        <!-- Holiday List -->
+        <div class="leave-history">
+            <h3>Holiday List</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for holiday in holidays %}
+                    <tr>
+                        <td>{{ holiday.name }}</td>
+                        <td>{{ holiday.date }}</td>
+                        <td>{{ holiday.get_holiday_type_display }}</td>
+                        <td>
+                            {% if user.is_superuser %}
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="holiday_id" value="{{ holiday.id }}">
+                                <button name="action" value="delete" style="color:red;">Delete</button>
+                            </form>
+                            {% else %}
+                            <span style="color:#999;">—</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No holidays added yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        
+    </div>
+
+</body>
+{% endblock %}

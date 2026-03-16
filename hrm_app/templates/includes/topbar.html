@@ -1,0 +1,220 @@
+{% load static %}
+
+
+<!-- templates/components/topbar.html -->
+<!-- BEGIN: Top Bar -->
+<div class="relative z-[51] flex h-[67px] items-center border-b border-slate-200">
+  <!-- BEGIN: Breadcrumb -->
+  <nav aria-label="breadcrumb" class="flex -intro-x mr-auto hidden sm:flex">
+    <ol class="flex items-center text-theme-1 dark:text-slate-300">
+      <li class="">
+        <a href="{% url 'index' %}">Xeventure</a>
+      </li>
+      <li
+        class="relative ml-5 pl-0.5 before:content-[''] before:w-[14px] before:h-[14px] before:bg-chevron-black before:transform before:rotate-[-90deg] before:bg-[length:100%] before:-ml-[1.125rem] before:absolute before:my-auto before:inset-y-0 dark:before:bg-chevron-white text-slate-800 cursor-text dark:text-slate-400">
+        <a href="{% url 'index' %}">Dashboard</a>
+      </li>
+    </ol>
+  </nav>
+  <!-- END: Breadcrumb -->
+
+  <!-- BEGIN: Notifications -->
+  <div class="dropdown relative intro-x mr-auto sm:mr-6">
+    <div id="notification-bell" class="cursor-pointer relative block text-slate-600 outline-none">
+      <i data-lucide="bell" class="stroke-1.5 w-5 h-5 dark:text-slate-500"></i>
+      <span id="notification-dot" class="hidden absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+    </div>
+    <div id="notification-dropdown" class="dropdown-menu absolute z-[9999] hidden right-0">
+      <div
+        class="dropdown-content rounded-md border-transparent bg-white shadow-[0px_3px_10px_#00000017] dark:border-transparent dark:bg-darkmode-600 mt-2 w-[280px] p-5 sm:w-[350px]">
+        <!-- Notification content -->
+        <div id="notification-container">
+          <p id="notification-empty" class="text-center text-slate-400">No notifications</p>
+          <div id="notification-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- END: Notifications -->
+
+  <!-- BEGIN: Account Menu -->
+  <div class="relative inline-block">
+  <!-- Profile Image (button, not link) -->
+  <div id="profileToggle"
+       class="cursor-pointer image-fit zoom-in intro-x block h-8 w-8 overflow-hidden rounded-full shadow-lg">
+    {% if request.user.profile.image and request.user.profile.image.name %}
+      <img src="{{ request.user.profile.image.url }}" alt="Profile" class="img-thumbnail rounded-circle" />
+    {% else %}
+      <img src="{% static 'images/fakers/image.png' %}" alt="Default Profile" class="img-thumbnail rounded-circle" />
+    {% endif %}
+  </div>
+
+  <!-- Dropdown Menu -->
+  <div id="profileDropdown"
+       class="dropdown-menu absolute right-0 z-[9999] hidden">
+    <div class="dropdown-content rounded-md border-transparent p-2 shadow-[0px_3px_10px_#00000017]
+                dark:border-transparent dark:bg-darkmode-600 mt-px w-56 bg-theme-1 text-white" style="color:white">
+      <div class="p-2 font-medium font-normal">
+        <div class="font-medium">{{ request.user.get_full_name }}</div>
+      </div>
+      <div class="h-px my-2 -mx-2 bg-slate-200/60 dark:bg-darkmode-400 bg-white/[0.08]"></div>
+
+      <a href="{% url 'profile' request.user.id %}"
+         class="cursor-pointer flex items-center p-2 rounded-md hover:bg-slate-200/60 dark:hover:bg-darkmode-400">
+        <i data-lucide="user" class="stroke-1.5 mr-2 h-4 w-4"></i> Profile
+      </a>
+
+      <a href="{% url 'passwordchange' %}"
+         class="cursor-pointer flex items-center p-2 rounded-md hover:bg-slate-200/60 dark:hover:bg-darkmode-400">
+        <i data-lucide="lock" class="stroke-1.5 mr-2 h-4 w-4"></i> Reset Password
+      </a>
+
+      <div class="h-px my-2 -mx-2 bg-slate-200/60 dark:bg-darkmode-400"></div>
+
+      <a href="{% url 'logout' %}"
+         class="cursor-pointer flex items-center p-2 rounded-md hover:bg-slate-200/60 dark:hover:bg-darkmode-400">
+        <i data-lucide="toggle-right" class="stroke-1.5 mr-2 h-4 w-4"></i> Logout
+      </a>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  const profileToggle = document.getElementById("profileToggle");
+  const dropdown = document.getElementById("profileDropdown");
+
+  // Toggle dropdown on click
+  profileToggle.addEventListener("click", (event) => {
+    event.stopPropagation(); // prevent bubbling
+    dropdown.classList.toggle("hidden");
+  });
+
+  // Hide dropdown when clicking outside
+  document.addEventListener("click", (event) => {
+    if (!dropdown.contains(event.target) && !profileToggle.contains(event.target)) {
+      dropdown.classList.add("hidden");
+    }
+  });
+</script>
+  <!-- END: Account Menu -->
+</div>
+<!-- END: Top Bar -->
+
+<!-- Notifications JS -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const bell = document.getElementById("notification-bell");
+    const dot = document.getElementById("notification-dot");
+    const list = document.getElementById("notification-list");
+    const empty = document.getElementById("notification-empty");
+    const dropdown = document.getElementById("notification-dropdown");
+
+    // Get CSRF token from cookie
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    async function loadNotifications() {
+      try {
+        const res = await fetch("{% url 'get_notifications' %}");
+
+        if (!res.ok) {
+          throw new Error('Failed to load notifications');
+        }
+
+        const data = await res.json();
+        const notifications = data.notifications || [];
+
+        if (notifications.length === 0) {
+          list.innerHTML = '';
+          empty.classList.remove('hidden');
+          dot.classList.add('hidden');
+          return;
+        }
+
+        empty.classList.add('hidden');
+
+        // Escape HTML to prevent XSS
+        const escapeHtml = (text) => {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        };
+
+        list.innerHTML = notifications.map(n => `
+        <div class="p-2 border-b border-slate-200 dark:border-slate-600 last:border-b-0 ${!n.read ? 'bg-blue-50 dark:bg-slate-700' : ''}">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="font-semibold text-sm text-slate-800 dark:text-slate-200">${escapeHtml(n.title)}</div>
+              <div class="text-xs text-slate-600 dark:text-slate-400 mt-1">${escapeHtml(n.message)}</div>
+            </div>
+            ${!n.read ? '<span class="ml-2 w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1"></span>' : ''}
+          </div>
+        </div>
+      `).join('');
+
+        // Show red dot on bell icon if there are any unread notifications
+        const hasUnread = notifications.some(n => !n.read);
+        if (hasUnread) {
+          dot.classList.remove('hidden');
+        } else {
+          dot.classList.add('hidden');
+        }
+
+      } catch (e) {
+        console.error("Error loading notifications:", e);
+        list.innerHTML = '<div class="p-2 text-center text-red-500 text-sm">Failed to load notifications</div>';
+        empty.classList.add('hidden');
+      }
+    }
+
+    // Toggle dropdown
+    bell.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle("hidden");
+
+      // Mark as read when opening
+      if (!dropdown.classList.contains("hidden")) {
+        try {
+          await fetch("{% url 'mark_notifications_read' %}", {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": csrftoken,
+              "Content-Type": "application/json"
+            }
+          });
+          dot.classList.add("hidden");
+        } catch (e) {
+          console.error("Error marking notifications read:", e);
+        }
+      }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add("hidden");
+      }
+    });
+
+    // Initial load
+    loadNotifications();
+
+    // Refresh every 30 seconds (changed from 10 to reduce server load)
+    setInterval(loadNotifications, 30000);
+  });
+</script>

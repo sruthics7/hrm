@@ -1,0 +1,36 @@
+#full-calendar .fc-today-button{
+    color: rgb(255, 255, 255);
+    background-color: rgb(var(--color-primary) / var(--tw-bg-opacity));
+    border: 0;
+    opacity: 1;
+}
+
+#full-calendar .fc-prev-button {
+    color: rgb(255, 255, 255);
+    background-color: rgb(var(--color-primary) / var(--tw-bg-opacity));
+    border: 0;
+    opacity: 1;
+
+}
+
+#full-calendar .fc-next-button {
+    color: rgb(255, 255, 255);
+    background-color: rgb(var(--color-primary) / var(--tw-bg-opacity));
+    border: 0;
+    opacity: 1;
+}
+
+
+ #full-calendar .fc-daygrid-event {
+  background-color: rgb(var(--color-primary) / var(--tw-bg-opacity));
+    color: white;
+ }
+
+ #full-calendar.fc-daygrid-event-dot{
+    background-color: rgb(128, 0, 0);
+    color: red;
+    padding: 20px;
+ }
+
+ 
+

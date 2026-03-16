@@ -1,0 +1,18 @@
+
+
+
+.custom-button {
+    padding-top: 10px;         /* top padding */
+    background-color: #007bff; /* Bootstrap primary blue */
+    color: white;              /* white text */
+    border-radius: 10px;       /* rounded corners */
+    border: none;              /* optional: remove border */
+    padding: 10px 20px;        /* overall padding */
+    cursor: pointer;           /* pointer cursor on hover */
+    margin-top: 10px;
+  }
+  
+  .custom-button:hover {
+    background-color: #0056b3; /* darker blue on hover */
+  }
+  

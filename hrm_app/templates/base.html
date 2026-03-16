@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>{% block title %}HRM-DASHBOARD{% endblock %}</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/fakers/xenployeelogo.svg' %}">
+
+  <link rel="stylesheet" href="{% static 'css/vendors/tiny-slider.css'%}" />
+  <link rel="stylesheet" href="{% static 'css/themes/rubick/side-nav.css'%}" />
+  <link rel="stylesheet" href="{% static 'css/vendors/leaflet.css'%}" />
+  <link rel="stylesheet" href="{% static 'css/app.css'%}" />
+  <link rel="stylesheet" href="{% static 'css/vendors/profile.css'%}">
+  <link rel="stylesheet" href="{% static 'css/vendors/registration.css'%}">
+  <link rel="stylesheet" href="{% static 'css/attendance.css'%}" />
+  <link rel="stylesheet" href="{% static 'css/vendors/tippy.css'%}" />
+  <link rel="stylesheet" href="{% static 'css/vendors/litepicker.css'%}" />
+  <link rel="stylesheet" href="{% static 'css/vendors/simplebar.css'%}" />
+  <link rel="stylesheet" href="{% static 'css/components/mobile-menu.css'%}" />
+  <!-- <link href="{% static '/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet"> -->
+
+  <!-- <link rel="stylesheet" href="{% static 'css/vendors/birdthday.css'%}"> -->
+  <link rel="stylesheet" href="{% static 'css/vendors/employeelist.css'%}" />
+  <link rel="stylesheet" href="{% static 'css/vendors/leavetracker.css'%}" />
+  <!-- <link rel="stylesheet" href="{% static 'css/profile.css'%}"/>   -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+  <link rel="stylesheet" href="{% static 'css/vendors/departments.css' %}">
+  <link rel="stylesheet" href="{% static 'css/vendors/settings.css' %}">
+  <link rel="stylesheet" href="{% static 'css/vendors/timesheet.css' %}">
+  <link rel="stylesheet" href="{% static 'css/edit_employee.css' %}">
+  <link rel="stylesheet" href="{% static 'css/add_department.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <link rel="stylesheet" href="{% static 'css/vendors/full-calendar.css' %}">
+
+  <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
+</head>
+
+<body>
+
+  {% if messages %}
+  <div id="toast-container" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;">
+    {% for message in messages %}
+    <div class="toast px-4 py-3 rounded shadow text-sm
+        {% if message.tags == 'success' %}bg-success
+        {% elif message.tags == 'error' %}bg-danger    
+        {% else %}bg-gray-800{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+
+  <script>
+
+    window.addEventListener('beforeunload', function (e) {
+      // This triggers the "Leave site?" dialog in most browsers
+      e.preventDefault();
+      e.returnValue = '';   // ← Chrome & most browsers need this line
+    });
+
+    setTimeout(() => {
+      const toastContainer = document.getElementById('toast-container');
+      if (toastContainer) {
+        toastContainer.style.display = 'none';
+      }
+    }, 3000);
+  </script>
+  {% endif %}
+
+
+  <div
+    class="rubick px-5 sm:px-8 py-5 before:content-[''] before:bg-gradient-to-b before:from-theme-1 before:to-theme-2 dark:before:from-darkmode-800 dark:before:to-darkmode-800 before:fixed before:inset-0 before:z-[-1]">
+    <!-- Mobile Menu -->
+    <div
+      class="mobile-menu group top-0 inset-x-0 fixed bg-theme-1/90 z-[60] border-b border-white/[0.08] dark:bg-darkmode-800/90 md:hidden before:content-[''] before:w-full before:h-screen before:z-10 before:fixed before:inset-x-0 before:bg-black/90 before:transition-opacity before:duration-200 before:ease-in-out before:invisible before:opacity-0 [&.mobile-menu--active]:before:visible [&.mobile-menu--active]:before:opacity-100">
+      <!-- Mobile menu content -->
+    </div>
+    <!-- end Mobile Menu -->
+    <div class="mt-[4.7rem] flex md:mt-0">
+      <!-- Include sidebar -->
+      {% include 'includes/sidebar.html' %}
+
+      <!-- BEGIN: Content -->
+      <div
+        class="md:max-w-auto min-h-screen min-w-0 max-w-full flex-1 rounded-[30px] bg-slate-100 px-4 pb-10 before:block before:h-px before:w-full before:content-[''] dark:bg-darkmode-700 md:px-[22px]">
+        <!-- Include topbar -->
+        {% include 'includes/topbar.html' %}
+
+        <!-- Main content block -->
+        {% block content %}{% endblock %}
+      </div>
+      <!-- END: Content -->
+    </div>
+  </div>
+
+  <!-- <div class="flex h-[70px] items-center px-3 sm:px-8">
+    <a class="mr-auto flex" href="#">
+        <img class="w-6" src="images/fakers/xenployeelogo.svg" alt="xenployeelogo">
+    </a>
+    <a class="mobile-menu-toggler" href="#">
+        <i data-tw-merge="" data-lucide="bar-chart2" class="stroke-1.5 h-8 w-8 -rotate-90 transform text-white"></i>
+    </a>
+</div>
+
+<a href="#" class="fixed top-0 right-0 mt-4 mr-4 transition-opacity duration-200 ease-in-out invisible opacity-0 group-[.mobile-menu--active]:visible group-[.mobile-menu--active]:opacity-100">
+    <i data-tw-merge="" data-lucide="x-circle" class="stroke-1.5 mobile-menu-toggler h-8 w-8 -rotate-90 transform text-white"></i>
+</a> -->
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+  <script src="{% static 'js/vendors/dom.js'%}"></script> <!--Main -->
+  <script src="{% static 'js/vendors/lucide.js'%}"></script> <!--dashboard and clender icon -->
+  <script src="{% static 'js/vendors/dayjs.js'%}"></script> <!-- project report date  -->
+  <script src="{% static 'js/vendors/popper.js'%}"></script> <!--profile and notification -->
+  <script src="{% static 'js/vendors/dropdown.js'%}"></script>
+  <script src="{% static 'js/vendors/tiny-slider.js'%}"></script> <!--important notes -->
+  <script src="{% static 'js/vendors/transition.js'%}"></script> <!--profile and notification -->
+  <script src="{% static 'js/vendors/chartjs.js'%}"></script> <!--project report -->
+  <script src="{% static 'js/vendors/leaflet-map.js'%}"></script> <!--official store -->
+  <script src="{% static 'js/vendors/axios.js'%}"></script>
+  <script src="{% static 'js/utils/colors.js'%}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+  <script src="{% static 'js/components/base/theme-color.js'%}"></script> <!--theme -->
+  <script src="{% static 'js/components/base/lucide.js'%}"></script>
+  <script src="{% static 'js/components/base/tippy.js'%}"></script>
+  <script src="{% static 'js/components/base/litepicker.js'%}"></script>
+  <script src="{% static 'js/components/report-line-chart.js'%}"></script>
+  <script src="{% static 'js/components/report-pie-chart.js'%}"></script>
+  <script src="{% static 'js/components/report-donut-chart.js'%}"></script>
+  <script src="{% static 'js/components/report-donut-chart-1.js'%}"></script>
+  <script src="{% static 'js/components/simple-line-chart-1.js'%}"></script>
+  <script src="{% static 'js/components/base/tiny-slider.js'%}"></script>
+  <script src="{% static 'js/themes/rubick.js'%}"></script>
+  <script src="{% static 'js/components/base/leaflet-map-loader.js'%}"></script>
+  <script src="{% static 'js/components/mobile-menu.js'%}"></script>
+  <script src="{% static 'js/components/themes/rubick/top-bar.js'%}"></script>
+  <script src="{% static 'js/vendors/inputmask.js' %}"></script>
+  <script src="{% static 'js/vendors/axios.js' %}"></script>
+  <script src="{% static 'js/vendors/litepicker.js' %}"></script>
+  <!-- profile-js -->
+
+  <!-- <script src="{% static 'js/vendors/tailwind-merge.js'%}"></script> -->
+  <script src="{% static 'js/vendors/simplebar.js'%}"></script>
+  <script src="{% static 'js/vendors/modal.js'%}"></script>
+  <!-- <script src="{% static 'js/themes/tinker.js'%}"></script> -->
+  <script src="{% static 'js/components/themes/tinker/top-bar.js'%}"></script>
+  <!-- profile-js -->
+
+  <!-- addingform  -->
+  <!-- <script src="{% static 'js/components/registration.js'%}"></script> -->
+  <!-- addingform -->
+
+  <!-- attendance -->
+  <script src="{% static 'js/components/attendance.js'%}"></script>
+  <!-- attendance -->
+
+
+  <!-- birthday -->
+  <script src="{% static 'js/vendors/calendar/calendar.js'%}"></script>
+  <script src="{% static 'js/vendors/calendar/plugins/interaction.js'%}"></script>
+  <script src="{% static 'js/vendors/calendar/plugins/day-grid.js'%}"></script>
+  <script src="{% static 'js/vendors/calendar/plugins/time-grid.js'%}"></script>
+  <script src="{% static 'js/vendors/calendar/plugins/list.js'%}"></script>
+  <script src="{% static 'js/components/base/calendar/draggable.js'%}"></script>
+  <script src="{% static 'js/components/base/calendar/calendar.js'%}"></script>
+  <!-- birthday -->
+
+</body>
+
+</html>

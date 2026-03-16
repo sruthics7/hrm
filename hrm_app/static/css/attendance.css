@@ -1,0 +1,58 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8f9fa;
+   
+  }
+ 
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 70px;
+
+  }
+  th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+  }
+  th {
+    background: #f0f2f5;
+    font-weight: 600;
+  }
+  input, select {
+    padding: 6px 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+  }
+  .actions button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 18px;
+  }
+  .save-btn {
+    color: rgb(2, 0, 128);
+  }
+  .delete-btn {
+    color: rgb(0, 39, 99);
+  }
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .top-bar button {
+    padding: 8px 16px;
+    background: #1e40af;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }

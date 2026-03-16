@@ -1,0 +1,438 @@
+.department-dashboard {
+    padding: 20px; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    transition: transform 0.3s ease;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 20px;
+  }
+  
+  .stat-info {
+    flex: 1;
+  }
+  
+  .stat-label {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  
+  .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 5px 0;
+  }
+  
+  .stat-change {
+    font-size: 12px;
+    margin-top: 5px;
+  }
+  
+  .stat-change.positive {
+    color: #10b981;
+  }
+  
+  .stat-change.negative {
+    color: #ef4444;
+  }
+  
+  .department-table-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    overflow: hidden;
+  }
+  
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .table-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .add-department-btn {
+    background: #003283;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background 0.3s;
+  }
+  
+  .add-department-btn:hover {
+    background: #2563eb;
+  }
+  
+  .add-department-btn i {
+    margin-right: 8px;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+    padding: 0 20px;
+  }
+  
+  .department-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+  }
+  
+  .department-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .department-table td {
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+  }
+  
+  .dept-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .dept-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 16px;
+    color: #3b82f6;
+  }
+  
+  .dept-name {
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .dept-email {
+    font-size: 12px;
+    color: #64748b;
+  }
+  .fas{
+    background-color: #003283;
+  }
+  .dept-head {
+    display: flex;
+    align-items: center;
+  }
+  .plusbtn{
+margin-left: 5px;
+  }
+  .dept-head img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .employee-count {
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .team-count {
+    font-size: 12px;
+    color: #64748b;
+  }
+  
+  .open-positions {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  
+  .open-positions.urgent {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  .action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 5px;
+    padding: 5px;
+  }
+  
+  .action-btn.edit {
+    color: #00368d;
+  }
+  
+  .action-btn.delete {
+    color: #ef4444;
+  }
+  
+  .table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-top: 1px solid #e2e8f0;
+  }
+  
+  .showing-entries {
+    font-size: 14px;
+    color: #64748b;
+  }
+  
+  .showing-entries span {
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .pagination {
+    display: flex;
+  }
+  
+  .pagination button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+    background: white;
+    margin: 0 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #64748b;
+  }
+  
+  .pagination button.active {
+    background: #e0f2fe;
+    color: #0369a1;
+    border-color: #bae6fd;
+  }
+  
+  .pagination button:hover:not(.active) {
+    background: #f1f5f9;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 20px;
+  }
+  
+  .department-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .dept-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .dept-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+  }
+  
+  .dept-title {
+    display: flex;
+    align-items: center;
+  }
+  
+  .dept-title .dept-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .dept-title h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .status-badge {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  
+  .status-badge.active {
+    background: #dcfce7;
+    color: #008800;
+  }
+  
+  .dept-description {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 20px;
+  }
+  
+  .progress-container {
+    margin-bottom: 20px;
+  }
+  
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+  
+  .progress-bar {
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 4px;
+  }
+  
+  .dept-details {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .detail-label {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+  
+  .detail-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .card-btn {
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+  }
+  
+  .card-btn i {
+    margin-right: 6px;
+  }
+  
+  .card-btn.view {
+    color: #3b82f6;
+  }
+  
+  .card-btn.reports {
+    color: #64748b;
+  }
+  
+  .card-btn.team {
+    color: #10b981;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .stats-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .table-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .add-department-btn {
+      margin-top: 12px;
+    }
+    
+    .table-footer {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .stats-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .department-cards {
+      grid-template-columns: 1fr;
+    }
+  }

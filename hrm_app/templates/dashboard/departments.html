@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}HRM-DASHBOARD{% endblock %}
+{% block content %}
+
+<h2 class="intro-y mt-10 text-lg font-medium">Departments</h2>
+
+<div class="department-dashboard">
+  <!-- Stats Cards Row -->
+  <div class="stats-container">
+    <!-- Total Departments -->
+    <div class="stat-card">
+      <div class="stat-icon bg-blue-100">
+        <i class="bi bi-buildings-fill" style="font-size: 26px;"></i>
+      </div>
+      <div class="stat-info">
+        <p class="stat-label">Total Departments</p>
+        <h3 class="stat-value text-start">{{ total_departments }}</h3>
+        <p class="stat-change positive">
+          <i class="bi bi-arrow-up-short"></i> {{ new_departments }} new this month
+        </p>
+      </div>
+    </div>
+
+    <!-- Total Employees -->
+    <div class="stat-card">
+      <div class="stat-icon bg-green-100">
+        <i class="bi bi-people" style="font-size: 26px;"></i>
+      </div>
+      <div class="stat-info">
+        <p class="stat-label">Total Employees</p>
+        <h3 class="stat-value text-start">{{ total_employees }}</h3>
+        <p class="stat-change positive">
+          <i class="bi bi-arrow-up-short"></i> {{ new_employees }} new hires
+        </p>
+      </div>
+    </div>
+
+    <!-- Open Positions -->
+    <div class="stat-card">
+      <div class="stat-icon bg-orange-100">
+        <i class="bi bi-door-open" style="font-size: 26px;"></i>
+      </div>
+      <div class="stat-info">
+        <p class="stat-label">Open Positions</p>
+        <h3 class="stat-value text-start">{{ open_positions }}</h3>
+        <p class="stat-change negative">
+          <i class="bi bi-arrow-down-short"></i> {{ urgent_positions }} urgent
+        </p>
+      </div>
+    </div>
+
+    <!-- Average Tenure -->
+    <div class="stat-card">
+      <div class="stat-icon bg-purple-100">
+        <i class="bi bi-clock-history" style="font-size: 26px;"></i>
+      </div>
+      <div class="stat-info">
+        <p class="stat-label">Avg. Tenure</p>
+        <h3 class="stat-value text-start">{{ avg_tenure }} yrs</h3>
+        <p class="stat-change positive">
+          <i class="bi bi-arrow-up-short"></i> {{ tenure_growth }}% increase
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Table -->
+  <div class="department-table-container">
+    <div class="table-header">
+      <h3>All Departments</h3>
+      <a href="{% url 'add_department' %}" class="add-department-btn btn btn-primary">
+        Add Department <i class="bi bi-plus-square"></i>
+      </a>
+    </div>
+
+    <!-- Entry count -->
+    <p class="text-muted ms-2" style="margin-left: 10px;">Showing {{ departments|length }} entries</p>
+
+    <div class="table-responsive">
+      <table class="department-table table table-bordered">
+        <thead>
+          <tr>
+            <th>Department</th>
+            <th>Head</th>
+            <th>Employees</th>
+            <th>Open Positions</th>
+            <th>Budget</th>   
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for department in departments %}
+          <tr>
+            <td>
+              <div class="dept-info">
+                <div class="dept-icon bg-blue-100">
+                  <i class="bi bi-building" style="font-size: 20px;"></i>
+                </div>
+                <span>{{ department.name }}</span>
+              </div>
+            </td>
+            <td>
+              {% if department.head %}
+                {{ department.head.get_full_name|default:department.head.username }}
+              {% else %}
+                <em>Unassigned</em>
+              {% endif %}
+            </td>
+            <td>{{ department.num_employees }}</td>
+            <td><span class="status active">{{ department.open_positions }}</span></td>
+            <td>₹{{ department.budget }}</td>
+            <td style="display: flex;">
+              <a href="{% url 'edit_departments' department.id %}" class="btn btn-warning" style="color:rgb(var(--color-primary) / var(--tw-bg-opacity));">
+                <i data-lucide="pencil"></i> 
+              </a>
+              <a href="{% url 'delete_department' department.id %}" class="btn btn-danger " onclick="return confirm('Are you sure you want to delete this department?');" style=" color: #a70b00;">
+                <i data-lucide="trash-2"></i> 
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center">No departments available.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}HRM-DASHBOARD{% endblock %}
+
+{% block content %}
+  <h2 class="intro-y mt-10 text-lg font-medium">Add New Department</h2>
+
+  <div class="department-dashboards">
+    <div class="department-form-container" style="background-color: white; padding: 20px; border-radius: 10px;">
+      <form method="POST" action="{% url 'add_department' %}">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+          <label for="department-name" class="form-label">Department Name</label>
+          <input type="text" class="form-control" id="department-name" name="name" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="department-head" class="form-label">Department Head</label>
+            <select class="form-select" id="department-head" name="head" required>
+              <option value="" selected disabled>Select Department Head</option>
+              {% for user in users %}
+                <option value="{{ user.username }}">{{ user.get_full_name|default:user.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+        <div class="mb-3">
+          <label for="department-employees" class="form-label">Number of Employees</label>
+          <input type="number" class="form-control" id="department-employees" name="num_employees" required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="department-open-positions" class="form-label">Open Positions</label>
+          <input type="number" class="form-control" id="department-open-positions" name="open_positions" required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="department-budget" class="form-label">Budget</label>
+          <input type="number" class="form-control" id="department-budget" name="budget" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="background-color:#007bff; border-radius: 5px; padding: 10px; color: white;">Add Department</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% block title %}HRM-DASHBOARD{% endblock %}
+
+{% block content %}
+<style>
+    .user-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .user-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 25px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    .info-value {
+        font-size: 16px;
+        color: #333;
+        padding: 10px 12px;
+        background: #f9fafb;
+        border-radius: 4px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .clock-display {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1d4ed8;
+    }
+
+    .btn-action {
+        background: #1d4ed8;
+        color: white;
+        padding: 12px 28px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-right: 10px;
+    }
+
+    .btn-action:hover:not(:disabled) {
+        background: #1e40af;
+    }
+
+    .btn-action.btn-out {
+        background: #dc2626;
+    }
+
+    .btn-action.btn-out:hover:not(:disabled) {
+        background: #b91c1c;
+    }
+
+    .btn-action:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .user-table thead {
+        background: #f9fafb;
+    }
+
+    .user-table th, .user-table td {
+        padding: 12px;
+        font-size: 14px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .badge-success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-danger {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge-info {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #9ca3af;
+    }
+
+    .divider {
+        margin: 30px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .messages {
+        margin-bottom: 20px;
+    }
+
+    .messages .success {
+        background: #dcfce7;
+        color: #166534;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+    }
+
+    .messages .error {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+    }
+</style>
+
+<div class="user-container">
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Today's Attendance -->
+    <div class="user-card">
+        <h2 class="section-title">My Attendance - {{ today }}</h2>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Current IST Time</span>
+                <span class="info-value clock-display" id="clock"></span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Status</span>
+                <span class="info-value">
+                    {% if record.status == 'Present' %}
+                        <span class="badge badge-success">{{ record.status }}</span>
+                    {% elif record.status == 'Absent' %}
+                        <span class="badge badge-danger">{{ record.status }}</span>
+                    {% else %}
+                        <span class="badge badge-info">{{ record.status }}</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Clock In</span>
+                <span class="info-value">
+                    {% if record.clock_in %}
+                        {{ record.clock_in|time:"H:i:s" }}
+                    {% else %}
+                        Not Yet
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Clock Out</span>
+                <span class="info-value">
+                    {% if record.clock_out %}
+                        {{ record.clock_out|time:"H:i:s" }}
+                    {% else %}
+                        Not Yet
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Hours Worked</span>
+                <span class="info-value">{{ record.formatted_hours|default:"--:--" }}</span>
+            </div>
+        </div>
+
+        <form method="post">
+    {% csrf_token %}
+    <button type="submit" name="action" value="clock_in"
+            {% if record.clock_in %}disabled{% endif %}
+            class="btn-action">
+        Clock In
+    </button>
+    <button type="submit" name="action" value="clock_out"
+            {% if not record.clock_in or record.clock_out %}disabled{% endif %}
+            class="btn-action btn-out">
+        Clock Out
+    </button>
+</form>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Attendance History -->
+    <div class="user-card">
+        <h2 class="section-title">My Past Attendance</h2>
+
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Clock In</th>
+                    <th>Clock Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rec in history %}
+                <tr>
+                    <td>{{ rec.date }}</td>
+                    <td>{% if rec.clock_in %}{{ rec.clock_in|time:"H:i:s" }}{% else %}--{% endif %}</td>
+                    <td>{% if rec.clock_out %}{{ rec.clock_out|time:"H:i:s" }}{% else %}--{% endif %}</td>
+                    <td>
+                        {% if rec.status == 'Present' %}
+                            <span class="badge badge-success">{{ rec.status }}</span>
+                        {% elif rec.status == 'Absent' %}
+                            <span class="badge badge-danger">{{ rec.status }}</span>
+                        {% else %}
+                            <span class="badge badge-info">{{ rec.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-state">No history found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+  // Display live IST clock in 24-hour format
+  function updateClock() {
+    const now = new Date();
+    const istOffset = 5.5 * 60; // IST is UTC+5:30
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const istTime = new Date(utc + istOffset * 60000);
+
+    const hours = String(istTime.getHours()).padStart(2, '0');
+    const minutes = String(istTime.getMinutes()).padStart(2, '0');
+    const seconds = String(istTime.getSeconds()).padStart(2, '0');
+
+    document.getElementById('clock').innerText = `${hours}:${minutes}:${seconds}`;
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}HRM-DASHBOARD{% endblock %}
+
+{% block content %}
+<div class="permissions-container">
+  <h2 class="section-title">Manage Module Permissions</h2>
+  <form method="POST">
+    {% csrf_token %}
+    <table class="permission-table">
+      <thead>
+        <tr>
+          <th>Module</th>
+          <th>Admin Access</th>
+          <th>Employee Access</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for module in modules %}
+        <tr>
+          <td>{{ module|title }}</td>
+          <td><input type="checkbox" name="Admin" value="{{ module }}"
+              {% if module in permissions.Admin %}checked{% endif %}></td>
+          <td><input type="checkbox" name="Employee" value="{{ module }}"
+              {% if module in permissions.Employee %}checked{% endif %}></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" class="btn-save">Save Permissions</button>
+  </form>
+</div>
+{% endblock %}

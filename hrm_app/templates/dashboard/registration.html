@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}HRM-DASHBOARD{% endblock %}
+{% block content %}
+<div class="md:max-w-full min-h-screen min-w-0 max-w-full flex-1 rounded-[30px] bg-slate-100 px-4 pb-10 dark:bg-darkmode-700 md:px-[22px]">
+  <div class="intro-y col-span-12 mt-2 flex  items-center sm:flex-nowrap">
+    <a href="{% url 'employes' %}" class="transition duration-200 border inline-flex items-center justify-center py-2 px-3 rounded-md font-medium cursor-pointer focus:ring-4 focus:ring-primary focus:ring-opacity-20 bg-primary border-primary text-white mr-2 shadow-md">
+      Employees List
+    </a>
+  </div>
+
+  <div class="addingform mt-8">
+    <div class="form-container-fluid bg-white p-6 rounded shadow w-full " style="padding: 30px;" >
+      <h2 class="text-2xl font-semibold mb-4">Add New Employee</h2>
+
+      {% if messages %}
+        <ul class="mb-4">
+          {% for message in messages %}
+            <li class="text-green-600" role="alert" style="color: green;">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- Full Name -->
+        <div class="form-group mb-4">
+          <label for="id_full_name">Full Name</label>
+          <input type="text" name="full_name" id="id_full_name" class="form-control w-full rounded border px-3 py-2" placeholder="Enter full name" required>
+          <div class="text-red-600 text-sm" style="color: red;">{{ form.full_name.errors }}</div>
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="form-group mb-4">
+          <label for="id_date_of_birth">Date of Birth</label>
+          <input type="date" name="date_of_birth" id="id_date_of_birth" class="form-control w-full rounded border px-3 py-2" placeholder="Select date of birth" max="{{ today }}" required>
+          <div class="text-red-600 text-sm" style="color: red;">{{ form.date_of_birth.errors }}</div>
+        </div>
+
+        <!-- Blood Group -->
+        <div class="form-group mb-4">
+          <label for="id_blood_group">Blood Group</label>
+          <input type="text" name="blood_group" id="id_blood_group" class="form-control w-full rounded border px-3 py-2" placeholder="Enter blood group (e.g., A+, B-)" required>
+          <div class="text-red-600 text-sm" style="color: red;">{{ form.blood_group.errors }}</div>
+        </div>
+
+        <!-- Joining Date -->
+        <div class="form-group mb-4">
+          <label for="id_joining_date">Joining Date</label>
+          <input type="date" name="joining_date" id="id_joining_date" class="form-control w-full rounded border px-3 py-2" placeholder="Select joining date" required>
+          <div class="text-red-600 text-sm" style="color: red;">{{ form.joining_date.errors }}</div>
+        </div>
+
+        <!-- Designation -->
+        <div class="form-group mb-4">
+          <label for="id_designation">Designation</label>
+          <input type="text" name="designation" id="id_designation" class="form-control w-full rounded border px-3 py-2" placeholder="Enter designation" required>
+          <div class="text-red-600 text-sm" style="color: red;">{{ form.designation.errors }}</div>
+        </div>
+
+        <!-- Department -->
+        <div class="form-group mb-4">
+          <label for="id_department">Department</label>
+          <select name="department" id="id_department" class="form-control w-full rounded border px-3 py-2" required>
+            <option value="" disabled selected>Select a department</option>
+            {% for dept in departments %}
+              <option value="{{ dept.id }}">{{ dept.name }}</option>
+            {% endfor %}
+          </select>
+          <div class="text-red-600 text-sm" style="color: red;">{{ form.department.errors }}</div>
+        </div>
+        
+        <!-- Email -->
+        <div class="form-group mb-4">
+          <label for="id_email">Email</label>
+          <input type="email" name="email" id="id_email" class="form-control w-full rounded border px-3 py-2" placeholder="Enter email address" required>
+          <div class="text-red-600 text-sm" style="color: red;">{{ form.email.errors }}</div>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group mb-4">
+          <label for="id_phone">Phone Number</label>
+          <input type="tel" name="phone" id="id_phone" class="form-control w-full rounded border px-3 py-2" placeholder="Enter phone number" required>
+          <div class="text-red-600 text-sm" style="color: red;">{{ form.phone.errors }}</div>
+        </div>
+
+        <!-- Emergency Number -->
+        <div class="form-group mb-4">
+          <label for="id_emergency_number">Emergency Number</label>
+          <input type="tel" name="emergency_number" id="id_emergency_number" class="form-control w-full rounded border px-3 py-2" placeholder="Enter emergency contact number" required>
+          <div class="text-red-600 text-sm" style="color: red;">{{ form.emergency_number.errors }}</div>
+        </div>
+
+        <!-- Salary -->
+        <div class="form-group mb-4">
+          <label for="id_salary">Salary</label>
+          <input type="number" name="salary" id="id_salary" class="form-control w-full rounded border px-3 py-2" placeholder="Enter salary" min="0" required>
+          <div class="text-red-600 text-sm " style="color: red;">{{ form.salary.errors }}</div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions mt-4">
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded ">Add Employee</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

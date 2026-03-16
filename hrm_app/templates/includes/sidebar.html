@@ -1,0 +1,73 @@
+{% load static %}
+<!-- BEGIN: Side Menu -->
+<nav class="side-nav hidden w-[80px] overflow-x-hidden pb-16 pr-5 md:block xl:w-[230px]">
+    <a href="{% url 'index'  %}" class="logo d-flex align-items-center">
+        <img src="{% static 'images/fakers/xenployeelogo.svg' %}" alt="">
+    </a>
+    <div class="my-6 side-nav__divider"></div>
+
+    <ul>
+        {% for module in modules %}
+            <li> 
+                <a href="javascript:;" class="side-menu side-menu--active" >
+                    <div class="side-menu__icon"><i class="{{ module.icon_class|default:'stroke-1.5 w-5 h-5' }}"></i></div>
+                    <div class="side-menu__title">
+                        {{ module.name }}
+                        <div class="side-menu__sub-icon transform rotate-180">
+                            <i data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+                        </div>
+                    </div>
+                </a>
+                <ul class="side-menu__sub-open hidden">
+                    {% for child in module.children.all %}
+                        <li>
+                            <a href="{% url child.url_name  %}" class="side-menu">
+                                <div class="side-menu__icon"><i class="stroke-1.5 w-5 h-5"></i></div>
+                                <div class="side-menu__title">
+                                    {{ child.name }} 
+                                    {% if child.sub_children.exists %}
+                                        <div class="side-menu__sub-icon transform rotate-180">
+                                            <i data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% if child.sub_children.exists %}
+                                <ul class="side-menu__sub-open hidden">
+                                    {% for sub in child.sub_children.all %}
+                                        <li>
+                                            <a href="{% url sub.url_name  %}" class="side-menu">
+                                                <div class="side-menu__icon"><i class="stroke-1.5 w-5 h-5"></i></div>
+                                                <div class="side-menu__title">
+                                                    {{ sub.name }}
+                                                    {% if sub.subsubchildren.exists %}
+                                                        <div class="side-menu__sub-icon transform rotate-180">
+                                                            <i data-lucide="chevron-down" class="stroke-1.5 w-5 h-5"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </a>
+                                            {% if sub.subsubchildren.exists %}
+                                                <ul class="side-menu__sub-open hidden">
+                                                    {% for subsub in sub.subsubchildren.all %}
+                                                        <li>
+                                                            <a href="{% url subsub.url_name  %}" class="side-menu">
+                                                                <div class="side-menu__icon"><i class="stroke-1.5 w-5 h-5"></i></div>
+                                                                <div class="side-menu__title">{{ subsub.name }}</div>
+                                                            </a>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+<!-- END: Side Menu -->

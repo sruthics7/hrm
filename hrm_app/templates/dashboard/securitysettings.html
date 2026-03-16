@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}HRM-DASHBOARD{% endblock %}
+{% block content %}
+
+
+
+
+  <body>
+  
+<h2 class="intro-y mt-10 text-lg font-medium">Security Settings & Notification Settings</h2>
+
+<!-- BEGIN: content start here ------------------------------------------------------------------------------------------------------->
+
+       
+<div class="px-8 pt-6 pb-8">
+    <!-- --------------------------------Security Settings-------------------------------------------- -->
+    <section class="settingspart" id="security">
+      <h3>Security Settings</h3>
+      <div class="form-group">
+        <label for="twofact">Enable Two-Factor Authentication</label>
+        <select id="twofact">
+          <option>Enabled</option>
+          <option>Disabled</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="session-timeout">Session Timeout (minutes)</label>
+        <input type="number" id="session-timeout" placeholder="30">
+      </div>
+      <button class="savebtn">Save Security Settings</button>
+    </section>
+  
+    <!-- --------------------------------Notification Settings-------------------------------------------- -->
+
+  </div>
+
+  {% endblock %}

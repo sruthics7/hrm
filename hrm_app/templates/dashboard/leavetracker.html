@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}HRM-DASHBOARD{% endblock %}
+{% block content %}
+
+
+<style>
+  .terms-section {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+  }
+
+  .terms-link {
+    color: #2668ad;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .terms-link:hover {
+    text-decoration: underline;
+  }
+</style>
+<!-- BEGIN: Leave Tracker -->
+<div class="leave-tracker">
+
+  {% if usergroup == "Admin" or usergroup == "Super Admin" %}
+  <!-- ================= ADMIN SECTION ================= -->
+
+  <h2>Leave Requests</h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <table id="leaveTable" class="table table-striped">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Type</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Days</th>
+          <th>Reason</th>
+          <th>Medical Proof</th>
+          <th>Compensation</th>
+          <th>Status</th>
+          <th>Action</th>
+          <th>Applied on</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for leave in leave_history %}
+        <tr>
+          <td>{{ leave.user.username }}</td>
+          <td>{{ leave.get_leave_type_display }}</td>
+          <td>{{ leave.start_date }}</td>
+          <td>{{ leave.end_date }}</td>
+          <td>{{ leave.days }}</td>
+          <td>{{ leave.reason|default:"-" }}</td>
+
+          <!-- Medical Proof -->
+          <td>
+            {% if leave.medical_proof %}
+            <a href="{{ leave.medical_proof.url }}" target="_blank">View</a>
+            {% else %}
+            -
+            {% endif %}
+          </td>
+
+          <!-- Emergency Compensation -->
+          <td>
+            {% if leave.leave_type == "EL" %}
+            {% if leave.is_compensated %}
+            <span class="approved">Done</span>
+            {% else %}
+            <span class="pending">Pending</span>
+            {% endif %}
+            {% else %}
+            -
+            {% endif %}
+          </td>
+
+          <!-- Status -->
+          <td
+            class="{% if leave.status == 'Approved' %}approved{% elif leave.status == 'Rejected' %}rejected{% else %}pending{% endif %}">
+            {{ leave.status }}
+          </td>
+
+          <!-- Actions -->
+          <td>
+            {% if leave.status == "Pending" %}
+            <input type="hidden" name="leave_id" value="{{ leave.id }}">
+            <div class="action-buttons">
+              <button name="action" value="approve" class="btn-approve">Approve</button>
+              <button name="action" value="reject" class="btn-reject">Reject</button>
+            </div>
+            {% else %}
+            {{ leave.status }}
+            {% endif %}
+          </td>
+          <td>{{ leave.applied_on|date:"M d, Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="10">No leave requests found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </form>
+
+  {% else %}
+  <!-- ================= EMPLOYEE SECTION ================= -->
+
+  <!-- Summary -->
+  <div class="summary-cards">
+    <div class="card">
+      <h4>Total</h4>
+      <p>{{ total_leaves }}</p>
+    </div>
+    <div class="card">
+      <h4>Taken</h4>
+      <p>{{ taken_leaves }}</p>
+    </div>
+    <div class="card">
+      <h4>Remaining</h4>
+      <p>{{ remaining_leaves }}</p>
+    </div>
+    <div class="card">
+      <h4>Medical Leaves</h4>
+      <p>{{ remaining_medical_leaves }} </p>
+    </div>
+  </div>
+
+  <!-- Apply Leave -->
+  <div class="leave-form">
+    <h3>Apply for Leave</h3>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Leave Type</label>
+          <select name="leave_type" id="leave_type" required>
+            <option value="">Select Leave Type</option>
+            {% for code, name in leave_type_choices %}
+            <option value="{{ code }}">{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>From</label>
+          <input type="date" name="start_date" id="start_date" required>
+          <small class="date-hint" id="start-hint"></small>
+        </div>
+
+        <div class="form-group">
+          <label>To</label>
+          <input type="date" name="end_date" id="end_date" required>
+          <small class="date-hint" id="end-hint"></small>
+        </div>
+
+        <div class="form-group">
+          <label>Reason</label>
+          <input type="text" name="reason">
+        </div>
+
+        <!-- Medical Proof -->
+        <div class="form-group" id="medical-proof-field" style="display:none;">
+          <label>Medical Proof <span style="color: red;">*</span></label>
+          <input type="file" name="medical_proof" id="medical_proof" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+
+      </div>
+      <button type="submit">Apply Leave</button>
+      <div class="terms-section">
+        <p>
+          By applying for leave, you agree to follow the company’s
+          <a href="{% url 'termsandconditions' %}" target="_blank" class="terms-link">
+            Leave Terms & Conditions
+          </a>.
+        </p>
+      </div>
+    </form>
+  </div>
+
+  <!-- History -->
+  <div class="leave-history">
+    <h3>Leave History</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Days</th>
+          <th>Status</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for leave in leave_history %}
+        <tr>
+          <td>{{ leave.get_leave_type_display }}</td>
+          <td>{{ leave.start_date }}</td>
+          <td>{{ leave.end_date }}</td>
+          <td>{{ leave.days }}</td>
+          <td
+            class="{% if leave.status == 'Approved' %}approved{% elif leave.status == 'Rejected' %}rejected{% else %}pending{% endif %}">
+            {{ leave.status }}
+          </td>
+          <td>{{ leave.reason|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6">No leave history found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% endif %}
+</div>
+<!-- END: Leave Tracker -->
+
+<script>
+
+
+  $(document).ready(function () {
+    if ($('#leaveTable').length) {
+      $('#leaveTable').DataTable({
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50],
+        ordering: true,
+        searching: true
+      });
+    }
+  });
+  const leaveType = document.getElementById("leave_type");
+  const medicalField = document.getElementById("medical-proof-field");
+  const medicalInput = document.getElementById("medical_proof");
+  const startDateField = document.getElementById("start_date");
+  const endDateField = document.getElementById("end_date");
+  const startHint = document.getElementById("start-hint");
+  const endHint = document.getElementById("end-hint");
+
+  // Get today's date and 30 days back
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+
+  // Format dates as YYYY-MM-DD
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  const todayStr = formatDate(today);
+  const thirtyDaysAgoStr = formatDate(thirtyDaysAgo);
+
+  // Toggle medical proof field and update date restrictions
+  function toggleMedical() {
+    const leaveTypeValue = leaveType ? leaveType.value : '';
+
+    // Show/Hide Medical Proof field
+    if (leaveTypeValue === "ML") {
+      medicalField.style.display = "block";
+      if (medicalInput) medicalInput.required = true;
+
+      // Medical Leave - Allow backdating (30 days)
+      startDateField.setAttribute('min', thirtyDaysAgoStr);
+      startDateField.setAttribute('max', todayStr);
+      endDateField.setAttribute('min', thirtyDaysAgoStr);
+      startHint.textContent = 'Medical Leave: Can select past 30 days';
+      endHint.textContent = 'End date must be on or after start date';
+
+    } else if (leaveTypeValue === "EL") {
+      medicalField.style.display = "none";
+      if (medicalInput) medicalInput.required = false;
+
+      // Emergency Leave - Allow backdating (30 days)
+      startDateField.setAttribute('min', thirtyDaysAgoStr);
+      startDateField.setAttribute('max', todayStr);
+      endDateField.setAttribute('min', thirtyDaysAgoStr);
+      startHint.textContent = 'Emergency Leave: Can select past 30 days';
+      endHint.textContent = 'End date must be on or after start date';
+
+    } else if (leaveTypeValue === "CL") {
+      medicalField.style.display = "none";
+      if (medicalInput) medicalInput.required = false;
+
+      // Casual Leave - Only future dates
+      startDateField.setAttribute('min', todayStr);
+      startDateField.removeAttribute('max');
+      endDateField.setAttribute('min', todayStr);
+      startHint.textContent = 'Casual Leave: Must be applied in advance';
+      endHint.textContent = 'End date must be on or after start date';
+
+    } else {
+      medicalField.style.display = "none";
+      if (medicalInput) medicalInput.required = false;
+
+      // Default - future dates
+      startDateField.setAttribute('min', todayStr);
+      startDateField.removeAttribute('max');
+      endDateField.setAttribute('min', todayStr);
+      startHint.textContent = '';
+      endHint.textContent = '';
+    }
+
+    // Reset date fields when leave type changes
+    startDateField.value = '';
+    endDateField.value = '';
+  }
+
+  // Update end date min based on start date
+  if (startDateField) {
+    startDateField.addEventListener('change', function () {
+      if (startDateField.value) {
+        endDateField.setAttribute('min', startDateField.value);
+      }
+    });
+  }
+
+  // Event listener for leave type change
+  if (leaveType) {
+    leaveType.addEventListener("change", toggleMedical);
+    toggleMedical(); // Initialize on page load
+  }
+</script>
+
+<style>
+  .leave-tracker {
+    padding: 20px;
+  }
+
+  .summary-cards {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .card {
+    flex: 1;
+    background-color: #2563eb;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .leave-form {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .date-hint {
+    display: block;
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 4px;
+  }
+
+  button {
+    background-color: #2563eb;
+    color: white;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  .leave-history table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .leave-history th,
+  .leave-history td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+  }
+
+  textarea {
+    width: 100%;
+    border-radius: 6px;
+    padding: 5px;
+    resize: none;
+  }
+
+  .approved {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .rejected {
+    color: #ef4444;
+    font-weight: 600;
+  }
+
+  .pending {
+    color: #f59e0b;
+    font-weight: 600;
+  }
+
+  .btn-approve {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+  }
+
+  .btn-reject {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+    justify-content: center;
+  }
+</style>
+
+{% endblock %}

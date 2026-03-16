@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Terms & Conditions – HRM Portal{% endblock %}
+
+{% block content %}
+
+<style>
+  /* Main container */
+  .terms-wrapper {
+    padding: 40px;
+    border-radius: 6px;
+  }
+
+  /* Page title */
+  .page-title {
+    font-size: 36px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+    color: #444;
+  }
+
+  /* Sidebar */
+  .toc {
+    border-right: 1px solid #e5e5e5;
+  }
+
+  .toc a {
+    display: block;
+    padding: 8px 0;
+    color: #444;
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  .toc a:hover {
+    color: #0d6efd;
+  }
+
+  /* Section title */
+  section h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-top: 30px;
+    margin-bottom: 15px;
+  }
+
+  /* Paragraph style */
+  section p {
+    line-height: 1.8;
+    text-align: justify;
+    color: #555;
+  }
+
+  /* Lists */
+  section ul {
+    padding-left: 20px;
+  }
+
+  section ul li {
+    list-style: disc;
+    margin-bottom: 8px;
+  }
+
+  /* Footer */
+  .terms-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    text-align: center;
+  }
+</style>
+
+
+<div class="container my-5">
+
+  <div class="terms-wrapper">
+
+    <!-- TITLE -->
+
+    <h3 class="page-title">
+      Terms & Conditions
+    </h3>
+
+
+    <div class="row">
+
+      <!-- SIDEBAR -->
+
+
+
+      <!-- MAIN CONTENT -->
+
+      <div class="col-md-9">
+
+
+        <section id="s1">
+
+          <h2>1. Acceptance of Terms</h2>
+
+          <p>
+            By accessing or using the HRM Portal, you acknowledge that you have read,
+            understood, and agreed to comply with these Terms and Conditions along
+            with all applicable company policies.
+          </p>
+
+          <p>
+            If you do not agree with these terms, you must discontinue use of the
+            system and inform the HR department immediately.
+          </p>
+
+        </section>
+
+
+
+        <section id="s2">
+
+          <h2>2. User Responsibilities</h2>
+
+          <p>
+            Employees must ensure that all information submitted through the HRM
+            Portal is accurate and up to date.
+          </p>
+
+          <ul>
+
+            <li>
+              Employees are responsible for verifying and maintaining accurate personal and contact information in the
+              system.
+            </li>
+
+            <li>Employees are required to mark clock-in and clock-out. Office working hours are from 9:00 AM to 6:00 PM.
+            </li>
+
+            <li>The official working hours begin at 9:00 AM. Clock-ins after 9:10 AM will be marked as late.
+              If an employee is late more than three times, it may be treated as a half-day</li>
+
+            <li>
+              Employees may take leave on the day before or after a holiday. Such leave should be compensated;
+              otherwise, it may result in a salary deduction.
+            </li>
+            <li>
+              Employees can check their total working hours after clock-out if the working hours are less
+              than 8 hours due to late arrival or early departure especially on Saturdays, it will be marked as a
+              half-day.
+            </li>
+            <li>
+              If an employee takes half-day leave but working hours less than 4 hours, the attendance will be marked as
+              absent
+              so every employee should responsible for maintaining their work schedule.
+            </li>
+            <li>
+              Hartal/Strike are not considered as a Holiday or Casual Leave, and employees should report for duty as
+              usual or may work from home if required; the working day can also be compensated.
+            </li>
+          </ul>
+
+          <p>
+            The company will not be responsible for issues caused by incorrect
+            information submitted by employees.
+          </p>
+
+        </section>
+
+
+
+        <section id="s3">
+
+          <h2>3. Leave Management</h2>
+
+          <p>
+            The leave management system follows the company’s official Leave Policy.
+            Employees submitting leave requests must follow the rules below.
+          </p>
+
+          <ul>
+
+            <li>
+              <strong>Casual Leave (CL):</strong>
+              Leave should be applied at least two days in advance. Employees must verify whether the leave request has
+              been approved.
+              A total of 12 casual leaves are available per year, and only 1 casual leave can be taken per month.
+              If more than one casual leave is taken in a month, the additional leave will be considered unpaid.
+            </li>
+
+            <li>
+              <strong>Medical Leave:</strong>
+              Medical leave may be applied after the leave has been taken and must be submitted within 30 days from the
+              date of absence with valid medical documentation.
+            </li>
+
+            <li>
+              <strong>Emergency Leave (EL):</strong>
+              Emergency leave may be applied within 30 days from the
+              date of absence.
+              Compensation is optional; if the leave is not compensated,
+              salary may be deducted.
+            </li>
+
+            <li>
+              Submitting false or fabricated leave documents is considered
+              a disciplinary offense.
+            </li>
+
+          </ul>
+
+        </section>
+
+
+
+        <section id="s4">
+
+          <h2>4. Data & Privacy</h2>
+
+          <p>
+            Personal data collected through the HRM Portal is processed
+            according to applicable data protection regulations.
+          </p>
+
+          <ul>
+
+            <li>Employee data is stored securely.</li>
+
+            <li>Access is restricted to authorized HR personnel.</li>
+
+            <li>Data may be shared only for payroll or legal purposes.</li>
+
+            <li>Employees may request access to their personal data.</li>
+
+          </ul>
+
+        </section>
+
+
+
+        <section id="s5">
+
+          <h2>5. Confidentiality</h2>
+
+          <p>
+            Information available within the HRM Portal such as employee records,
+            payroll information, and leave balances is strictly confidential.
+          </p>
+
+          <ul>
+
+            <li>Employees must not disclose HR data to unauthorized persons.</li>
+
+            <li>Screenshots or exported HR data must not be shared externally.</li>
+
+            <li>Confidentiality obligations continue after employment ends.</li>
+
+          </ul>
+
+        </section>
+
+
+
+        <section id="s6">
+
+          <h2>6. Amendments</h2>
+
+          <p>
+            The company reserves the right to modify these Terms and Conditions
+            at any time. Employees will be notified through email or system
+            notifications.
+          </p>
+
+          <p>
+            Continued use of the HRM Portal after such updates will be considered
+            acceptance of the revised terms.
+          </p>
+
+        </section>
+
+
+
+
+
+
+
+        <!-- FOOTER -->
+
+        <div class="terms-footer">
+
+          <p>
+            By continuing to use the HRM Portal, you confirm that you have
+            <strong>read, understood, and agreed</strong> to these Terms
+            and Conditions.
+          </p>
+
+          <a href="/dashboard" class="btn btn-primary mt-2">
+            I Accept & Continue
+          </a>
+
+        </div>
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+
+      e.preventDefault();
+
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
+      });
+
+    });
+  });
+
+</script>
+
+{% endblock %}

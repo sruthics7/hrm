@@ -1,0 +1,198 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HRM-DASHBOARD</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+
+  <!-- Toastr -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #0066FF 0%, #004bb5 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .login-card {
+      width: 400px;
+      max-width: 90vw;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      background-color: #ffffff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .logo {
+      width: 100px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .login-title {
+      color: #2b2b2b;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .input-group-text {
+      background-color: #ffffff;
+      border-right: none;
+      font-size: 18px;
+    }
+
+    .form-control {
+      border-left: none;
+    }
+
+    .form-control:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 102, 255, 0.25);
+      border-color: #0066FF;
+    }
+
+    .btn-primary {
+      background-color: #0066FF;
+      border: none;
+      border-radius: 5px;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .btn-primary:hover {
+      background-color: #0052cc;
+      transform: translateY(-2px);
+    }
+
+    .input-group {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 15px;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-top: 20px;
+    }
+
+    .text-end a {
+      color: #0066FF;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .text-end a:hover {
+      color: #0052cc;
+    }
+
+    .alert {
+      max-width: 300px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-card card">
+    <div class="card-header">
+      <!-- Add your logo -->
+      <img src="{% static 'images/fakers/xenployeelogoblack.png' %}" class="logo" alt="Logo">
+      <h4 class="login-title">Login</h4>
+    </div>
+
+    <div class="card-body">
+      <!-- Django messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Non-field errors -->
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %} {{ error }} {% endfor %}
+        </div>
+      {% endif %}
+
+      <form role="form" method="post">
+        {% csrf_token %}
+
+        <div class="input-group mb-3">
+          <span class="input-group-text bg-white">
+            <i class="bi bi-person"></i>
+          </span>
+          <input type="text" name="username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" id="id_username"
+            value="{{ form.username.value|default:'' }}" placeholder="Username" required>
+        </div>
+        {% if form.username.errors %}
+          <div class="form-errors text-danger small mb-2">
+            {% for error in form.username.errors %} {{ error }} {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="input-group mb-3">
+          <span class="input-group-text bg-white">
+            <i class="bi bi-lock"></i>
+          </span>
+          <input type="password" name="password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" id="id_password"
+            placeholder="Password" required>
+        </div>
+        {% if form.password.errors %}
+          <div class="form-errors text-danger small mb-2">
+            {% for error in form.password.errors %} {{ error }} {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="text-end mb-3">
+          <a href="#">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-box-arrow-in-right me-2"></i> Login
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</body>
+</html>

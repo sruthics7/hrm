@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}HRM-DASHBOARD{% endblock %}
+{% block content %}
+
+<h2 class="intro-y mt-10 text-lg font-medium">heading</h2>
+
+<!-- BEGIN: content start here ------------------------------------------------------------------------------------------------------->
+
+<section class="settingspart" id="team">
+  <div class="team-header">
+    <h3>User & Team Management</h3>
+    <a href="{% url 'add_user' %}"><button class="settingsbtn">Add New User</button></a>
+  </div>
+
+  <table class="team-management">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for profile in users %}
+      <tr>
+        <td>{{ profile.user }} </td>
+        <td>{{ profile.user.email }}</td>
+        <td>{{ profile.usergroup|title }}</td>
+        <td>
+          <!-- <button class="settingseditbtn">Edit</button> -->
+          {% if request.user.is_superuser %}
+          <a href="{% url 'delete_user' profile.user.id %}"
+            onclick="return confirm('Are you sure you want to remove this user?');">
+            <button class="settingsremovebtn">Remove</button>
+          </a>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4">No users found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% endblock %}

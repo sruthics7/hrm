@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% block title %}HRM-DASHBOARD{% endblock %}
+
+{% block content %}
+<style>
+    .user-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .user-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 25px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+
+    .btn-add {
+        background: #1d4ed8;
+        color: white;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-add:hover {
+        background: #1e40af;
+    }
+</style>
+
+<div class="user-container">
+    <div class="user-card">
+        <h2 class="section-title">Edit User Info</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-grid">
+                <!-- User Information -->
+                
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" value="{{ profile.name }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="{{ user.username }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password1">Password (leave blank to keep current)</label>
+                    <input type="password" id="password1" name="password1">
+                </div>
+
+                <div class="form-group">
+                    <label for="usergroup">User Role</label>
+                    <select id="usergroup" name="usergroup" required>
+                        <option value="Admin" {% if profile.usergroup == "Admin" %}selected{% endif %}>Admin</option>
+                        <option value="Employee" {% if profile.usergroup == "Employee" %}selected{% endif %}>Employee</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Profile Image</label>
+                    <input type="file" id="image" name="image">
+                </div>
+
+                <!-- Employee Details -->
+                {% if employee %}
+                    <div class="form-group">
+                        <label for="date_of_birth">Date of Birth</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth" value="{{ employee.date_of_birth }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="joining_date">Joining Date</label>
+                        <input type="date" id="joining_date" name="joining_date" value="{{ employee.joining_date }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="designation">Designation</label>
+                        <input type="text" id="designation" name="designation" value="{{ employee.designation }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" name="department">
+                            {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if employee.department_id == dept.id %}selected{% endif %}>{{ dept.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="salary">Salary</label>
+                        <input type="number" id="salary" name="salary" value="{{ employee.salary }}" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" value="{{ employee.phone }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="emergency_number">Emergency Contact</label>
+                        <input type="text" id="emergency_number" name="emergency_number" value="{{ employee.emergency_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="blood_group">Blood Group</label>
+                        <input type="text" id="blood_group" name="blood_group" value="{{ employee.blood_group }}">
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-add">Update User</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
