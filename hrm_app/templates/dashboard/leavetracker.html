@@ -20,6 +20,35 @@
   .terms-link:hover {
     text-decoration: underline;
   }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: flex-end;
+  }
+
+  .filter-bar select,
+  .filter-bar input[type="date"] {
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    background: white;
+    color: #374151;
+  }
+
+  .filter-bar button {
+    padding: 6px 14px;
+    font-size: 13px;
+    margin-top: 0;
+    border-radius: 8px;
+  }
+
+  .btn-reset {
+    background-color: #6b7280 !important;
+  }
 </style>
 <!-- BEGIN: Leave Tracker -->
 <div class="leave-tracker">
@@ -29,83 +58,118 @@
 
   <h2>Leave Requests</h2>
 
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div>
+      <label style="font-size:12px; color:#6b7280; display:block; margin-bottom:3px;">Status</label>
+      <select id="filterStatus">
+        <option value="">All Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size:12px; color:#6b7280; display:block; margin-bottom:3px;">Leave Type</label>
+      <select id="filterType">
+        <option value="">All Types</option>
+        <option value="Medical">Medical</option>
+        <option value="Emergency">Emergency</option>
+        <option value="Casual">Casual</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size:12px; color:#6b7280; display:block; margin-bottom:3px;">From Date</label>
+      <input type="date" id="filterFrom">
+    </div>
+    <div>
+      <label style="font-size:12px; color:#6b7280; display:block; margin-bottom:3px;">To Date</label>
+      <input type="date" id="filterTo">
+    </div>
+    <button onclick="applyFilters()">Filter</button>
+    <button class="btn-reset" onclick="resetFilters()">Reset</button>
+  </div>
+
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <table id="leaveTable" class="table table-striped">
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Type</th>
-          <th>From</th>
-          <th>To</th>
-          <th>Days</th>
-          <th>Reason</th>
-          <th>Medical Proof</th>
-          <th>Compensation</th>
-          <th>Status</th>
-          <th>Action</th>
-          <th>Applied on</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for leave in leave_history %}
-        <tr>
-          <td>{{ leave.user.username }}</td>
-          <td>{{ leave.get_leave_type_display }}</td>
-          <td>{{ leave.start_date }}</td>
-          <td>{{ leave.end_date }}</td>
-          <td>{{ leave.days }}</td>
-          <td>{{ leave.reason|default:"-" }}</td>
+    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
+      <table id="leaveTable" class="table table-striped">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Type</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Days</th>
+            <th>Reason</th>
+            <th>Medical Proof</th>
+            <th>Compensation</th>
+            <th>Status</th>
+            <th>Action</th>
+            <th>Applied on</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for leave in leave_history %}
+          <tr data-status="{{ leave.status }}" data-type="{{ leave.get_leave_type_display }}"
+            data-from="{{ leave.start_date }}" data-to="{{ leave.end_date }}">
+            <td>{{ leave.user.username }}</td>
+            <td>{{ leave.get_leave_type_display }}</td>
+            <td>{{ leave.start_date }}</td>
+            <td>{{ leave.end_date }}</td>
+            <td>{{ leave.days }}</td>
+            <td>{{ leave.reason|default:"-" }}</td>
 
-          <!-- Medical Proof -->
-          <td>
-            {% if leave.medical_proof %}
-            <a href="{{ leave.medical_proof.url }}" target="_blank">View</a>
-            {% else %}
-            -
-            {% endif %}
-          </td>
+            <!-- Medical Proof -->
+            <td>
+              {% if leave.medical_proof %}
+              <a href="{{ leave.medical_proof.url }}" target="_blank">View</a>
+              {% else %}
+              -
+              {% endif %}
+            </td>
 
-          <!-- Emergency Compensation -->
-          <td>
-            {% if leave.leave_type == "EL" %}
-            {% if leave.is_compensated %}
-            <span class="approved">Done</span>
-            {% else %}
-            <span class="pending">Pending</span>
-            {% endif %}
-            {% else %}
-            -
-            {% endif %}
-          </td>
+            <!-- Emergency Compensation -->
+            <td>
+              {% if leave.leave_type == "EL" %}
+              {% if leave.is_compensated %}
+              <span class="approved">Done</span>
+              {% else %}
+              <span class="pending">Pending</span>
+              {% endif %}
+              {% else %}
+              -
+              {% endif %}
+            </td>
 
-          <!-- Status -->
-          <td
-            class="{% if leave.status == 'Approved' %}approved{% elif leave.status == 'Rejected' %}rejected{% else %}pending{% endif %}">
-            {{ leave.status }}
-          </td>
+            <!-- Status -->
+            <td
+              class="{% if leave.status == 'Approved' %}approved{% elif leave.status == 'Rejected' %}rejected{% else %}pending{% endif %}">
+              {{ leave.status }}
+            </td>
 
-          <!-- Actions -->
-          <td>
-            {% if leave.status == "Pending" %}
-            <input type="hidden" name="leave_id" value="{{ leave.id }}">
-            <div class="action-buttons">
-              <button name="action" value="approve" class="btn-approve">Approve</button>
-              <button name="action" value="reject" class="btn-reject">Reject</button>
-            </div>
-            {% else %}
-            {{ leave.status }}
-            {% endif %}
-          </td>
-          <td>{{ leave.applied_on|date:"M d, Y" }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="10">No leave requests found.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+            <!-- Actions -->
+            <td>
+              {% if leave.status == "Pending" %}
+              <input type="hidden" name="leave_id" value="{{ leave.id }}">
+              <div class="action-buttons">
+                <button name="action" value="approve" class="btn-approve">Approve</button>
+                <button name="action" value="reject" class="btn-reject">Reject</button>
+              </div>
+              {% else %}
+              {{ leave.status }}
+              {% endif %}
+            </td>
+            <td>{{ leave.applied_on|date:"M d, Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="11">No leave requests found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </form>
 
   {% else %}
@@ -176,7 +240,7 @@
       <button type="submit">Apply Leave</button>
       <div class="terms-section">
         <p>
-          By applying for leave, you agree to follow the company’s
+          By applying for leave, you agree to follow the company's
           <a href="{% url 'termsandconditions' %}" target="_blank" class="terms-link">
             Leave Terms & Conditions
           </a>.
@@ -197,6 +261,7 @@
           <th>Days</th>
           <th>Status</th>
           <th>Reason</th>
+          <th>Edit</th>
         </tr>
       </thead>
       <tbody>
@@ -211,6 +276,19 @@
             {{ leave.status }}
           </td>
           <td>{{ leave.reason|default:"-" }}</td>
+          <td>
+            {% if leave.status == 'Pending' %}
+            <button onclick="makeRowEditable(this, {{ leave.id }})" class="btn btn-primary btn-sm me-1"
+              id="edit-btn-{{ leave.id }}">
+              Edit
+            </button>
+            <button onclick="confirmDelete({{ leave.id }})" class="btn btn-danger btn-sm">
+              Delete
+            </button>
+            {% else %}
+            -
+            {% endif %}
+          </td>
         </tr>
         {% empty %}
         <tr>
@@ -227,7 +305,6 @@
 
 <script>
 
-
   $(document).ready(function () {
     if ($('#leaveTable').length) {
       $('#leaveTable').DataTable({
@@ -238,6 +315,95 @@
       });
     }
   });
+
+  function applyFilters() {
+    const status = document.getElementById('filterStatus').value.toLowerCase().trim();
+    const type = document.getElementById('filterType').value.toLowerCase().trim();
+    const fromVal = document.getElementById('filterFrom').value;
+    const toVal = document.getElementById('filterTo').value;
+
+    // Convert filter inputs to Date objects (YYYY-MM-DD format from <input type="date"> is reliable)
+    const filterFrom = fromVal ? new Date(fromVal) : null;
+    const filterTo = toVal ? new Date(toVal) : null;
+
+    // Optional: Set filterTo to end of day so it includes the whole selected day
+    if (filterTo) {
+      filterTo.setHours(23, 59, 59, 999);
+    }
+
+    const rows = document.querySelectorAll('#leaveTable tbody tr');
+
+    rows.forEach(row => {
+      const rowStatus = (row.getAttribute('data-status') || '').toLowerCase().trim();
+      const rowType = (row.getAttribute('data-type') || '').toLowerCase().trim();
+
+      let rowFrom = null;
+      let rowTo = null;
+
+      const fromStr = row.getAttribute('data-from');
+      const toStr = row.getAttribute('data-to');
+
+      if (fromStr) {
+        rowFrom = new Date(fromStr);
+        // If invalid date, try to normalize (common with dd/mm/yyyy)
+        if (isNaN(rowFrom.getTime())) {
+          rowFrom = parseDateString(fromStr);
+        }
+      }
+
+      if (toStr) {
+        rowTo = new Date(toStr);
+        if (isNaN(rowTo.getTime())) {
+          rowTo = parseDateString(toStr);
+        }
+      }
+
+      const statusMatch = !status || rowStatus === status;
+      const typeMatch = !type || rowType.includes(type);
+
+      // Date matching (inclusive)
+      const fromMatch = !filterFrom || (rowFrom && !isNaN(rowFrom.getTime()) && rowFrom >= filterFrom);
+      const toMatch = !filterTo || (rowTo && !isNaN(rowTo.getTime()) && rowTo <= filterTo);
+
+      row.style.display = (statusMatch && typeMatch && fromMatch && toMatch) ? '' : 'none';
+    });
+  }
+
+  // Helper function to handle different date formats (dd/mm/yyyy, dd-mm-yyyy, etc.)
+  function parseDateString(dateStr) {
+    if (!dateStr) return null;
+
+    // Try common formats
+    const formats = [
+      /(\d{2})[\/-](\d{2})[\/-](\d{4})/,   // dd/mm/yyyy or dd-mm-yyyy
+      /(\d{4})[\/-](\d{2})[\/-](\d{2})/    // yyyy/mm/dd
+    ];
+
+    for (let regex of formats) {
+      const match = dateStr.match(regex);
+      if (match) {
+        if (match[1].length === 4) { // yyyy-mm-dd
+          return new Date(match[1], match[2] - 1, match[3]);
+        } else { // dd-mm-yyyy
+          return new Date(match[3], match[2] - 1, match[1]);
+        }
+      }
+    }
+
+    // Fallback: let native Date try
+    return new Date(dateStr);
+  }
+
+  function resetFilters() {
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterType').value = '';
+    document.getElementById('filterFrom').value = '';
+    document.getElementById('filterTo').value = '';
+
+    const rows = document.querySelectorAll('#leaveTable tbody tr');
+    rows.forEach(row => row.style.display = '');
+  }
+
   const leaveType = document.getElementById("leave_type");
   const medicalField = document.getElementById("medical-proof-field");
   const medicalInput = document.getElementById("medical_proof");
@@ -246,12 +412,10 @@
   const startHint = document.getElementById("start-hint");
   const endHint = document.getElementById("end-hint");
 
-  // Get today's date and 30 days back
   const today = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
 
-  // Format dates as YYYY-MM-DD
   function formatDate(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -262,16 +426,12 @@
   const todayStr = formatDate(today);
   const thirtyDaysAgoStr = formatDate(thirtyDaysAgo);
 
-  // Toggle medical proof field and update date restrictions
   function toggleMedical() {
     const leaveTypeValue = leaveType ? leaveType.value : '';
 
-    // Show/Hide Medical Proof field
     if (leaveTypeValue === "ML") {
       medicalField.style.display = "block";
       if (medicalInput) medicalInput.required = true;
-
-      // Medical Leave - Allow backdating (30 days)
       startDateField.setAttribute('min', thirtyDaysAgoStr);
       startDateField.setAttribute('max', todayStr);
       endDateField.setAttribute('min', thirtyDaysAgoStr);
@@ -281,8 +441,6 @@
     } else if (leaveTypeValue === "EL") {
       medicalField.style.display = "none";
       if (medicalInput) medicalInput.required = false;
-
-      // Emergency Leave - Allow backdating (30 days)
       startDateField.setAttribute('min', thirtyDaysAgoStr);
       startDateField.setAttribute('max', todayStr);
       endDateField.setAttribute('min', thirtyDaysAgoStr);
@@ -292,8 +450,6 @@
     } else if (leaveTypeValue === "CL") {
       medicalField.style.display = "none";
       if (medicalInput) medicalInput.required = false;
-
-      // Casual Leave - Only future dates
       startDateField.setAttribute('min', todayStr);
       startDateField.removeAttribute('max');
       endDateField.setAttribute('min', todayStr);
@@ -303,8 +459,6 @@
     } else {
       medicalField.style.display = "none";
       if (medicalInput) medicalInput.required = false;
-
-      // Default - future dates
       startDateField.setAttribute('min', todayStr);
       startDateField.removeAttribute('max');
       endDateField.setAttribute('min', todayStr);
@@ -312,12 +466,10 @@
       endHint.textContent = '';
     }
 
-    // Reset date fields when leave type changes
     startDateField.value = '';
     endDateField.value = '';
   }
 
-  // Update end date min based on start date
   if (startDateField) {
     startDateField.addEventListener('change', function () {
       if (startDateField.value) {
@@ -326,10 +478,143 @@
     });
   }
 
-  // Event listener for leave type change
   if (leaveType) {
     leaveType.addEventListener("change", toggleMedical);
-    toggleMedical(); // Initialize on page load
+    toggleMedical();
+  }
+
+  function openEditModal(id, leave_type, start_date, end_date, reason) {
+    console.log("openEditModal called with ID:", id); // For debugging
+
+    const editId = document.getElementById('edit_leave_id');
+    const editType = document.getElementById('edit_leave_type');
+    const editStart = document.getElementById('edit_start_date');
+    const editEnd = document.getElementById('edit_end_date');
+    const editReason = document.getElementById('edit_reason');
+    const editForm = document.getElementById('editLeaveForm');
+
+    // Safety check
+    if (!editId || !editType || !editStart || !editEnd || !editReason || !editForm) {
+      console.error("Modal elements not found! Check if modal HTML is in the page.");
+      alert("Error: Edit modal not loaded properly. Please refresh the page.");
+      return;
+    }
+
+    // Set values
+    editId.value = id;
+    editType.value = leave_type;
+    editStart.value = start_date;
+    editEnd.value = end_date;
+    editReason.value = reason || '';
+
+    // Set dynamic form action
+    editForm.action = "{% url 'edit_leave' 0 %}".replace('0', id);
+
+    // Show modal
+    const modalElement = document.getElementById('editLeaveModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    } else {
+      alert("Modal not found. Please check modal HTML.");
+    }
+  }
+  function makeRowEditable(btn, leaveId) {
+    const row = btn.closest('tr');
+
+    // Get current values
+    const leaveTypeCell = row.cells[0];
+    const startDateCell = row.cells[1];
+    const endDateCell = row.cells[2];
+    const reasonCell = row.cells[5];
+
+    const currentType = leaveTypeCell.textContent.trim();
+    const currentStart = startDateCell.textContent.trim();
+    const currentEnd = endDateCell.textContent.trim();
+    const currentReason = reasonCell.textContent.trim() === '-' ? '' : reasonCell.textContent.trim();
+
+    // Convert cells to editable inputs
+    leaveTypeCell.innerHTML = `
+        <select class="form-control form-control-sm" id="inline_type_${leaveId}">
+            {% for value, label in leave_type_choices %}
+                <option value="{{ value }}" {% if value == currentType %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>`;
+
+    startDateCell.innerHTML = `<input type="date" class="form-control form-control-sm" id="inline_start_${leaveId}" value="${currentStart}">`;
+    endDateCell.innerHTML = `<input type="date" class="form-control form-control-sm" id="inline_end_${leaveId}" value="${currentEnd}">`;
+    reasonCell.innerHTML = `<input type="text" class="form-control form-control-sm" id="inline_reason_${leaveId}" value="${currentReason}">`;
+
+    // Change Edit button to Save + Cancel
+    btn.outerHTML = `
+        <button onclick="saveInlineEdit(${leaveId})" class="btn btn-success btn-sm me-1">Save</button>
+        <button onclick="cancelInlineEdit(this, ${leaveId}, '${currentType}', '${currentStart}', '${currentEnd}', '${currentReason}')" 
+                class="btn btn-secondary btn-sm">Cancel</button>`;
+  }
+
+  // Save Inline Edit
+  function saveInlineEdit(leaveId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{% url 'edit_leave' 0 %}".replace('0', leaveId);
+    form.style.display = 'none';
+
+    form.innerHTML = `
+        {% csrf_token %}
+        <input type="hidden" name="leave_id" value="${leaveId}">
+        <input type="hidden" name="leave_type" value="${document.getElementById('inline_type_' + leaveId).value}">
+        <input type="hidden" name="start_date" value="${document.getElementById('inline_start_' + leaveId).value}">
+        <input type="hidden" name="end_date" value="${document.getElementById('inline_end_' + leaveId).value}">
+        <input type="hidden" name="reason" value="${document.getElementById('inline_reason_' + leaveId).value}">
+    `;
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  // Cancel Inline Edit
+  function cancelInlineEdit(btn, leaveId, type, start, end, reason) {
+    const row = btn.closest('tr');
+
+    row.cells[0].textContent = type;
+    row.cells[1].textContent = start;
+    row.cells[2].textContent = end;
+    row.cells[5].textContent = reason || '-';
+
+    // Restore Edit & Delete buttons
+    const actionCell = row.cells[6];  // Change index if your action column is different
+    actionCell.innerHTML = `
+        <button onclick="makeRowEditable(this, ${leaveId})" class="btn btn-primary btn-sm me-1">Edit</button>
+        <button onclick="confirmDelete(${leaveId})" class="btn btn-danger btn-sm">Delete</button>
+    `;
+  }
+
+  function confirmDelete(id) {
+    if (confirm("Are you sure you want to delete this leave request?")) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = "{% url 'delete_leave' 0 %}".replace('0', id);
+      form.innerHTML = `<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">`;
+      document.body.appendChild(form);
+      form.submit();
+    }
+  }
+
+  function confirmDelete(id) {
+    if (confirm("Are you sure you want to delete this leave request? This action cannot be undone.")) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `{% url 'delete_leave' 0 %}`.replace('0', id);  // Dynamic URL
+
+      const csrf = document.createElement('input');
+      csrf.type = 'hidden';
+      csrf.name = 'csrfmiddlewaretoken';
+      csrf.value = '{{ csrf_token }}';
+      form.appendChild(csrf);
+
+      document.body.appendChild(form);
+      form.submit();
+    }
   }
 </script>
 

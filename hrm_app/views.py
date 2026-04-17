@@ -102,11 +102,12 @@ def index(request):
         profile = request.user.profile
         usergroup = profile.usergroup
 
-        # Calculate total employees here — this is what the card needs
-        total_employees = Employee.objects.count()
+        # ✅ Filter only active users
+        active_users = User.objects.filter(is_active=True).values_list('email', flat=True)
+        total_employees = Employee.objects.filter(email__in=active_users).count()
 
         context = {
-            'total_employees': total_employees,  # ← This is what your card needs
+            'total_employees': total_employees,
         }
 
         if usergroup == 'Super Admin':
@@ -538,13 +539,15 @@ def leavetracker(request):
                         leave.is_paid = True
                 
                     # Monthly CL rule
-                    existing_cl = LeaveRequest.objects.filter(
-                        user=request.user,
-                        leave_type='CL',
-                        start_date__year=start_date.year,
-                        start_date__month=start_date.month
-                    ).count()
-                
+                    existing_cl = (
+                        LeaveRequest.objects.filter(
+                            user=request.user,
+                            leave_type='CL',
+                            start_date__year=start_date.year,
+                            start_date__month=start_date.month
+                        ).aggregate(total=models.Sum('days'))['total'] or 0
+                    )
+                    
                     if existing_cl >= 1:
                         leave.is_paid = False
                         messages.warning(request, "This leave will be marked as Unpaid Casual Leave.")
@@ -810,7 +813,66 @@ Status: Approved
     }
 
     return render(request, 'dashboard/leavetracker.html', context)
+@login_required
+def edit_leave(request, leave_id):
+    leave = get_object_or_404(LeaveRequest, id=leave_id, user=request.user, status='Pending')
+    
+    if request.method == 'POST':
+        form = LeaveRequestForm(request.POST, request.FILES, instance=leave)
+        
+        if form.is_valid():
+            updated_leave = form.save(commit=False)
+            
+            start_date = updated_leave.start_date.date() if hasattr(updated_leave.start_date, 'date') else updated_leave.start_date
+            end_date = updated_leave.end_date.date() if hasattr(updated_leave.end_date, 'date') else updated_leave.end_date
 
+            if end_date < start_date:
+                messages.error(request, "End date cannot be before start date.")
+                return redirect('leavetracker')
+
+            updated_leave.days = (end_date - start_date).days + 1
+            today = timezone.now().date()
+
+            # Re-apply validations
+            if updated_leave.leave_type == 'CL':
+                two_days_later = today + timedelta(days=2)
+                if start_date <= two_days_later:
+                    messages.error(request, "Casual Leave must be applied at least 2 days in advance.")
+                    return redirect('leavetracker')
+
+            if updated_leave.leave_type == 'ML' and not updated_leave.medical_proof:
+                messages.error(request, "Medical proof is required for Medical Leave.")
+                return redirect('leavetracker')
+
+            # Overlapping check (exclude current leave)
+            overlapping = LeaveRequest.objects.filter(
+                user=request.user,
+                status__in=['Pending', 'Approved']
+            ).exclude(id=leave.id).exclude(end_date__lt=start_date).exclude(start_date__gt=end_date)
+
+            if overlapping.exists():
+                messages.error(request, "These dates overlap with another leave request.")
+                return redirect('leavetracker')
+
+            updated_leave.save()
+            messages.success(request, "Leave request updated successfully.")
+            return redirect('leavetracker')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+    
+    # If GET request (just in case)
+    return redirect('leavetracker')
+
+@login_required
+def delete_leave(request, leave_id):
+    if request.method == 'POST':
+        leave = get_object_or_404(LeaveRequest, id=leave_id, user=request.user, status='Pending')
+        leave.delete()
+        messages.success(request, "Leave request deleted successfully.")
+    
+    return redirect('leavetracker')
 def termsandconditions(request):
     
     return render(request, 'dashboard/termsconditions.html')
@@ -1199,8 +1261,10 @@ def birthday_anniversary_view(request):
     # =========================
     # 🔹 PAGE LOAD (GET REQUEST)
     # =========================
-    birthdays = Employee.objects.all()
-    anniversaries = Employee.objects.all()
+    active_users = User.objects.filter(is_active=True).values_list('email', flat=True)
+
+    birthdays = Employee.objects.filter(email__in=active_users)
+    anniversaries = Employee.objects.filter(email__in=active_users)
 
     # 🎂 Birthday calculations
     for emp in birthdays:
@@ -1723,15 +1787,14 @@ def employes(request):
         messages.error(request, "Profile not found.")
         return redirect('index')
 
-    # Show ALL employees — no inner join that can hide records
-    employees = Employee.objects.select_related('department').all().order_by('-joining_date')
+    active_users = User.objects.filter(is_active=True).values_list('email', flat=True)
 
-    # Optional debug (remove later if you want)
-    print(f"DEBUG: Found {employees.count()} employees in database")
+    employees = Employee.objects.select_related('department')\
+        .filter(email__in=active_users)\
+        .order_by('-joining_date')
 
     return render(request, 'dashboard/employes.html', {
         'employees': employees,
-        'debug_count': employees.count(),  # Remove this line later if not needed
     })
     
     
@@ -1745,8 +1808,7 @@ def timesheet(request):
     today = timezone.localdate()
     selected_date = request.GET.get('date', '')
     selected_month = request.GET.get('month', '')
-    selected_user = request.GET.get('user')
-
+    selected_user = request.GET.get('user') 
     # Check role
     is_admin = request.user.is_superuser or getattr(request.user, "profile", None) and getattr(request.user.profile, "usergroup", "") == "Admin"
 
@@ -1918,7 +1980,8 @@ def payroll(request):
         current_day += timedelta(days=1)
 
     # -------- Loop Employees --------
-    for employee in Employee.objects.all():
+    active_users = User.objects.filter(is_active=True).values_list('email', flat=True)
+    for employee in Employee.objects.filter(email__in=active_users):
 
         latest_payroll = Payroll.objects.filter(
             employee=employee

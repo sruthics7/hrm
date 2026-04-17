@@ -51,12 +51,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'hrm_app.middleware.IPRestrictionMiddleware',
 ]
+
 ALLOWED_IPS = [
     '127.0.0.1',
     '192.168.1.35',
     '192.168.1.46',
     '192.168.1.85',
 ]
+
 ROOT_URLCONF = 'hrm.urls'
 
 TEMPLATES = [
